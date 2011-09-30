@@ -10,7 +10,7 @@ public class RecognizerTest {
 	@Test
 	public void testClassify() throws IOException {
 		Recognizer recognizer = new Recognizer();
-		recognizer.open(new File("/home/kawasima/Downloads/zinnia-tomoe-0.6.0-20080911/handwriting-ja.model"));
+		recognizer.open(new File("handwriting-ja.model"));
 		Character c = new Character(300, 300);
 		c.add(0, 51, 29);
 		c.add(0, 117, 41);
