@@ -13,6 +13,16 @@ public class Features {
 		public Node first;
 		public Node last;
 	}
+	
+	public static class NodeSet {
+		public NodeSet(Node first, Node last) {
+			this.first = first;
+			this.last  = last;
+		}
+		public Node first;
+		public Node last;
+		public Node best;
+	}
 
 
 	public Features() {
@@ -29,20 +39,19 @@ public class Features {
 		return Math.sqrt(x*x + y*y);
 	}
 
-	private double minimumDistance(Node first, Node last, Node best) {
-		if (first == last)
+	private double minimumDistance(NodeSet nodeSet) {
+		if (nodeSet.first == nodeSet.last)
 			return 0.0;
-		double a = last.x - first.x;
-		double b = last.y - first.y;
-		double c = last.y * first.x - last.x * first.y;
+		double a = nodeSet.last.x - nodeSet.first.x;
+		double b = nodeSet.last.y - nodeSet.first.y;
+		double c = nodeSet.last.y * nodeSet.first.x - nodeSet.last.x * nodeSet.first.y;
 
 		double max = -1.0;
-		for (Node n = first; n != last; n = n.next) {
+		for (Node n = nodeSet.first; n != nodeSet.last; n = n.next) {
 			double dist = Math.abs((a * n.y)- (b * n.x)+ c);
 			if (dist > max) {
 				max = dist;
-				best.x = n.x;
-				best.y = n.y;
+				nodeSet.best = n;
 			}
 		}
 		return max * max / (a*a + b*b);
@@ -102,12 +111,12 @@ public class Features {
 		pair.first = first;
 		pair.last  = last;
 
-		Node best = new Node();
-		double dist = minimumDistance(first, last, best);
+		NodeSet nodeSet = new NodeSet(first, last);
+		double dist = minimumDistance(nodeSet);
 
 		if(dist > 0.001/*error factor*/) {
-			getVertex(first, best, id * 2 + 1, nodePairs);
-			getVertex(best,  last, id * 2 + 2, nodePairs);
+			getVertex(nodeSet.first, nodeSet.best, id * 2 + 1, nodePairs);
+			getVertex(nodeSet.best,  nodeSet.last, id * 2 + 2, nodePairs);
 		}
 	}
 

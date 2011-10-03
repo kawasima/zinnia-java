@@ -12,8 +12,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.logging.Logger;
+
+import org.apache.commons.lang.StringUtils;
 
 public class Recognizer {
+	private static final Logger logger = Logger.getLogger(Recognizer.class.getName());
 	private static final Charset charset = Charset.forName("UTF-8");
 	private static class Model {
 		String character;
@@ -36,7 +40,7 @@ public class Recognizer {
 		MappedByteBuffer buffer = stream
 			.getChannel()
 			.map(FileChannel.MapMode.READ_ONLY, 0, file.length());
-		buffer.order(ByteOrder.BIG_ENDIAN);
+		buffer.order(ByteOrder.LITTLE_ENDIAN);
 		return open(buffer);
 	}
 
@@ -53,12 +57,12 @@ public class Recognizer {
 			int len;
 			for(len = 0;  b[len] != 0 && len < 16; len++) ;
 			m.character = new String(b, 0, len, charset);
-			m.bias = buffer.getFloat();
+			m.bias = buffer.getInt() & 0xffffffffL;
 
 			while(true) {
 				FeatureNode f = new FeatureNode();
 				f.index = buffer.getInt();
-				f.value = buffer.getFloat();
+				f.value = buffer.getInt() & 0xffffffffL;
 				m.x.add(f);
 				if(f.index == -1)
 					break;
@@ -101,8 +105,11 @@ public class Recognizer {
 		});
 
 		Result result = new Result();
-		for (int i=0; i < nbest; ++i) {
+		for (int i=0; result.getSize() < nbest; i++) {
+			if(StringUtils.containsAny(results.get(i).second, "0123456789"))
+				continue;
 			result.add(results.get(i).second, results.get(i).first);
+			logger.info(results.get(i).second + ":" + results.get(i).first);
 		}
 
 		return result;

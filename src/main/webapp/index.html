@@ -1,0 +1,71 @@
+<!DOCTYPEp html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+<link type="text/css" href="jquery.signaturepad.css" rel="stylesheet"/>
+<style>
+.showCandidate li {
+	list-style-type: none;
+	float: left;
+}
+</style>
+<script src="jquery.js" type="text/javascript"></script>
+<script src="json2.min.js" type="text/javascript"></script>
+<script src="zinniapad.js" type="text/javascript"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+	var strokes = [];
+	var currentStroke;
+	$(".sigPad").signaturePad({
+		drawOnly: true,
+		onDrawStart: function() {
+			currentStroke =[];
+		},
+		onDraw: function(x, y) {
+			currentStroke.push([x,y]);
+		},
+		onDrawEnd: function(){
+			if(!currentStroke || currentStroke.length == 0)
+				return;
+			strokes.push(currentStroke);
+			currentStroke = null;
+			$.post('/recognize',
+				{x:300, y:300, strokes: JSON.stringify(strokes)},
+				function(data) {
+					var list = $("<ul/>");
+					$.each(data, function(i, c) {
+						list.append($("<li/>").text(c))
+					}); 
+					$(".showCandidate").empty().append(list);
+				});
+		},
+		onClear: function() {
+			strokes = [];
+		}
+	});
+});
+</script>
+<title>手書き認識</title>
+</head>
+<body>
+<form method="post" action="" class="sigPad">
+  <label for="name">Print your name</label>
+  <input type="text" name="name" id="name" class="name">
+  <p class="typeItDesc">Review your signature</p>
+  <p class="drawItDesc">Draw your signature</p>
+  <ul class="sigNav">
+    <li class="typeIt"><a href="#type-it" class="current">Type It</a></li>
+    <li class="drawIt"><a href="#draw-it">Draw It</a></li>
+    <li class="clearButton"><a href="#clear">Clear</a></li>
+  </ul>
+  <div class="sig sigWrapper">
+    <div class="typed"></div>
+    <canvas class="pad" width="300" height="300"></canvas>
+    <input type="hidden" name="output" class="output">
+  </div>
+  <div class="showCandidate">
+  </div>
+  <button type="submit">I accept the terms of this agreement.</button>
+</form>
+</body>
+</html>
