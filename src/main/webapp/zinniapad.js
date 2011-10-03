@@ -185,8 +185,8 @@ function SignaturePad (selector, options) {
       ,'mx': previous.x
       ,'my': previous.y
     });
-    
-    settings.onDraw(newX, newY);
+
+    settings.onDraw.apply(self, [newX, newY]);
 
     previous.x = newX
     previous.y = newY
@@ -211,11 +211,11 @@ function SignaturePad (selector, options) {
 
     previous.x = null
     previous.y = null
-    
+
     // End Event
 
     if (output.length > 0) {
-      settings.onDrawEnd();
+      settings.onDrawEnd.apply(self);
       $(settings.output, context).val(JSON.stringify(output))
     }
   }
@@ -257,7 +257,7 @@ function SignaturePad (selector, options) {
 
     $(settings.output, context).val('')
     output = []
-    settings.onClear();
+    settings.onClear.apply(self);
   }
 
   /**
@@ -279,7 +279,7 @@ function SignaturePad (selector, options) {
     }
 
     // Draws a single point on initial mouse down, for people with periods in their name
-    settings.onDrawStart();
+    settings.onDrawStart.apply(self);
     drawLine(e, 1)
   }
 

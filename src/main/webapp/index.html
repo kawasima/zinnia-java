@@ -4,6 +4,9 @@
 <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
 <link type="text/css" href="jquery.signaturepad.css" rel="stylesheet"/>
 <style>
+.showCandidate {
+	width: 100%;
+}
 .showCandidate li {
 	list-style-type: none;
 	float: left;
@@ -25,6 +28,7 @@ $(document).ready(function() {
 			currentStroke.push([x,y]);
 		},
 		onDrawEnd: function(){
+			var $this = this;
 			if(!currentStroke || currentStroke.length == 0)
 				return;
 			strokes.push(currentStroke);
@@ -34,13 +38,27 @@ $(document).ready(function() {
 				function(data) {
 					var list = $("<ul/>");
 					$.each(data, function(i, c) {
-						list.append($("<li/>").text(c))
-					}); 
+						list.append($("<li/>")
+							.text(c)
+							.css({cursor: "pointer", border: "none", margin: "1px"})
+							.hover(
+								function() {
+									$(this).css({backgroundColor: "#ffd700", border: "1px solid #fa8072", margin: "0px"})
+								},
+								function() {
+									$(this).css({backgroundColor: "transparent", border: "none", margin: "1px"})
+								})
+							.click(function() {
+								$("#name").val( $("#name").val() + $(this).text());
+								$this.clearCanvas();
+							})
+					)});
 					$(".showCandidate").empty().append(list);
 				});
 		},
 		onClear: function() {
 			strokes = [];
+			$(".showCandidate").empty();
 		}
 	});
 });
@@ -54,16 +72,14 @@ $(document).ready(function() {
   <p class="typeItDesc">Review your signature</p>
   <p class="drawItDesc">Draw your signature</p>
   <ul class="sigNav">
-    <li class="typeIt"><a href="#type-it" class="current">Type It</a></li>
-    <li class="drawIt"><a href="#draw-it">Draw It</a></li>
+    <li class="showCandidate"></li>
     <li class="clearButton"><a href="#clear">Clear</a></li>
   </ul>
   <div class="sig sigWrapper">
+
     <div class="typed"></div>
     <canvas class="pad" width="300" height="300"></canvas>
     <input type="hidden" name="output" class="output">
-  </div>
-  <div class="showCandidate">
   </div>
   <button type="submit">I accept the terms of this agreement.</button>
 </form>

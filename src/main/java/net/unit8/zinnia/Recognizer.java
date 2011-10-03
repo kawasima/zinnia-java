@@ -57,12 +57,12 @@ public class Recognizer {
 			int len;
 			for(len = 0;  b[len] != 0 && len < 16; len++) ;
 			m.character = new String(b, 0, len, charset);
-			m.bias = buffer.getInt() & 0xffffffffL;
+			m.bias = buffer.getInt();
 
 			while(true) {
 				FeatureNode f = new FeatureNode();
 				f.index = buffer.getInt();
-				f.value = buffer.getInt() & 0xffffffffL;
+				f.value = buffer.getInt();
 				m.x.add(f);
 				if(f.index == -1)
 					break;
