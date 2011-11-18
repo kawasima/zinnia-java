@@ -5,8 +5,6 @@ import java.io.IOException;
 import org.junit.Test;
 
 public class TrainerTest {
-
-	@Test
 	public void testConvert() throws IOException {
 		Trainer trainer = new Trainer();
 		trainer.convert("handwriting-ja.model.txt"

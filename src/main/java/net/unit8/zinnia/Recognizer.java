@@ -40,7 +40,7 @@ public class Recognizer {
 		MappedByteBuffer buffer = stream
 			.getChannel()
 			.map(FileChannel.MapMode.READ_ONLY, 0, file.length());
-		buffer.order(ByteOrder.LITTLE_ENDIAN);
+		buffer.order(ByteOrder.BIG_ENDIAN);
 		return open(buffer);
 	}
 
