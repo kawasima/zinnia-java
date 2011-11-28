@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel.MapMode;
+import java.util.Arrays;
+import java.util.Collections;
 
 import org.junit.Test;
 
@@ -22,5 +24,14 @@ public class ByteBufferTest {
 			System.out.print(new String(b, 0, len));
 		}
 		System.out.println();
+	}
+
+	@Test
+	public void randomShuffle() {
+		String[] abc = {"a", "b", "c"};
+		Collections.shuffle(Arrays.asList(abc));
+
+		for(String s : abc)
+			System.out.print(s);
 	}
 }

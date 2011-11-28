@@ -1,8 +1,12 @@
 package net.unit8.zinnia;
 
+import java.io.IOException;
+import java.text.StringCharacterIterator;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
 
 public class Character {
 	public static class Dot {
@@ -43,12 +47,20 @@ public class Character {
 	private String value;
 	private Sexp sexp;
 
-	public Character(int width, int height) {
-		this.width = width;
-		this.height= height;
+	public Character() {
 		strokes = new ArrayList<List<Dot>>();
+		sexp = new Sexp();
 	}
 
+	public Character(int width, int height) {
+		this();
+		this.width = width;
+		this.height= height;
+	}
+
+	public String getValue() {
+		return value;
+	}
 	public void setValue(String value) {
 		this.value = value;
 	}
@@ -100,9 +112,58 @@ public class Character {
 		return true;
 	}
 
-	public boolean parse(String str, int length) {
-		clear();
+	public static Character parse(String str) throws IOException {
+		Character c = new Character();
+		Sexp.Cell rootCell = c.sexp.read(new StringCharacterIterator(str));
+		if (rootCell == null) {
+			return null;
+		}
 
-		return true;
+		Sexp.Cell ccel = rootCell.getCar();
+		if (!ccel.isAtom() || !StringUtils.equals("character", ccel.getAtom())) {
+			return null;
+		}
+
+		for (Sexp.Cell it =  rootCell.getCdr(); it != null; it = it.getCdr()) {
+			Sexp.Cell cell = it.getCar();
+			if (cell.getCar() != null && cell.getCar().isAtom() &&
+				cell.getCdr() != null && cell.getCdr().getCar() != null &&
+				cell.getCdr().getCar().isAtom()) {
+				String name   = cell.getCar().getAtom();
+				String value = cell.getCdr().getCar().getAtom();
+
+				if (StringUtils.equals("value", name)) {
+					c.setValue(value);
+				} else if (StringUtils.equals("width", name)) {
+					c.setWidth(Integer.parseInt(value));
+				} else if (StringUtils.equals("height", name)) {
+					c.setHeight(Integer.parseInt(value));
+				}
+			}
+
+			if (cell.getCar() != null && cell.getCar().isAtom() &&
+				cell.getCdr() != null && cell.getCdr().getCar() != null &&
+				cell.getCdr().getCar().isCons()) {
+				int id = 0;
+				for (Sexp.Cell st = cell.getCdr(); st != null; st = st.getCdr()) {
+					for (Sexp.Cell dot = st.getCar(); dot != null; dot = dot.getCdr()) {
+						if (dot.getCar() != null && dot.getCar().getCar() != null &&
+							dot.getCar().getCar().isAtom() &&
+							dot.getCar().getCdr() != null &&
+							dot.getCar().getCdr().getCar() != null &&
+							dot.getCar().getCdr().getCar().isAtom()) {
+							c.add(id,
+								Integer.parseInt(dot.getCar().getCar().getAtom()),
+								Integer.parseInt(dot.getCar().getCdr().getCar().getAtom()));
+						}
+					}
+					++id;
+				}
+			}
+
+		}
+
+
+		return c;
 	}
 }

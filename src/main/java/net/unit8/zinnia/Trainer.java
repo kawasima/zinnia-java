@@ -1,9 +1,12 @@
 package net.unit8.zinnia;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
@@ -11,13 +14,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
+
 public class Trainer {
-	private List<Pair<String, FeatureNode>> x;
+	private List<Pair<String, List<FeatureNode>>> x;
 	public static final int DIC_VERSION = 1;
+	public static final double THRESHOLD = 1.0e-3;
 	int maxDim;
 
-	boolean makeExample(String key, List<Pair<String,FeatureNode>> x, List<Double> y
-			, List<FeatureNode> copyX) {
+	List<FeatureNode> copyFeatureNode(List<FeatureNode> fn, int maxDim) {
+		return null;
+	}
+
+	boolean makeExample(String key, List<Pair<String,List<FeatureNode>>> x, List<Double> y
+			, List<List<FeatureNode>> copyX) {
 		int posNum = 0;
 		int negNum = 0;
 		y.clear();
@@ -35,34 +45,59 @@ public class Trainer {
 		return (posNum > 0 && negNum > 0);
 	}
 
+	public void add(Character c) {
+		String y = c.getValue();
+		Features features = Features.read(c);
+		List<FeatureNode> fn = features.get();
+		x.add(new Pair<String, List<FeatureNode>>(y, fn));
+	}
+
 	public boolean train(String filename) throws IOException {
-		FileOutputStream ofs = new FileOutputStream(filename + ".txt");
 		Set<String> dicSet = new HashSet<String>();
 		for (int i=0; i < x.size(); ++i)
 			dicSet.add(x.get(i).first);
 
 		Double[] w = new Double[maxDim + 1];
 		List<Double> y = new ArrayList<Double>();
-		List<FeatureNode> xCopy = new ArrayList<FeatureNode>();
+		List<List<FeatureNode>> xCopy = new ArrayList<List<FeatureNode>>();
 
 
-		List<String> dic = new ArrayList<String>(dicSet);
-		for (int i=0; i<dic.size(); ++i) {
-			if (makeExample(dic.get(i), x, y, xCopy)) {
-				System.err.println("cannot make training data");
+		BufferedWriter ofs = null;
+
+		try {
+			ofs = new BufferedWriter(new FileWriter(new File(filename + ".txt")));
+			List<String> dic = new ArrayList<String>(dicSet);
+			for (int i=0; i<dic.size(); ++i) {
+				if (makeExample(dic.get(i), x, y, xCopy)) {
+					System.err.println("cannot make training data");
+				}
+				System.out.println("learning: (" + i + "/" + dic.size() + ") " + dic.get(i) + " ");
+
+				SVM.train(y.size(),
+						w.length,
+						y,
+						xCopy,
+						1.0,
+						w);
+				ofs.write(dic.get(i));
+				ofs.write(" ");
+				ofs.write(w[0].toString());
+
+				for (int j = 1; j < w.length; ++j) {
+					if (Math.abs(w[j]) >= THRESHOLD) {
+						ofs.write(" ");
+						ofs.write(Integer.toString(j));
+						ofs.write(":");
+						ofs.write(Double.toString(w[j]));
+					}
+				}
+				ofs.write("\n");
+
 			}
-			System.out.println("learning: (" + i + "/" + dic.size() + ") " + dic.get(i) + " ");
-
-			List<List<FeatureNode>> xCopyList = new ArrayList<List<FeatureNode>>();
-			xCopyList.add(xCopy);
-
-			SVM.train(y.size(),
-					w.length,
-					y,
-					xCopyList,
-					1.0,
-					w);
+		} finally {
+			IOUtils.closeQuietly(ofs);
 		}
+		convert(filename+"txt", filename, 0.0f);
 		return false;
 	}
 

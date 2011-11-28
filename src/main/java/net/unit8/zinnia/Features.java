@@ -13,7 +13,7 @@ public class Features {
 		public Node first;
 		public Node last;
 	}
-	
+
 	public static class NodeSet {
 		public NodeSet(Node first, Node last) {
 			this.first = first;
@@ -128,8 +128,8 @@ public class Features {
 
 	}
 
-	public boolean read(Character character) {
-		features.clear();
+	public static Features read(Character character) {
+		Features features = new Features();
 		Node prev = null;
 
 		// bias term
@@ -137,7 +137,7 @@ public class Features {
 			FeatureNode f = new FeatureNode();
 			f.index = 0;
 			f.value = 1.0;
-			features.add(f);
+			features.features.add(f);
 		}
 
 		List<List<Node>> nodes = new ArrayList<List<Node>>(character.getStrokesSize());
@@ -148,12 +148,12 @@ public class Features {
 		{
 			int height = character.getHeight();
 			int width  = character.getWidth();
-			if (height == 0 || width == 0) return false;
-			if (character.getStrokesSize() == 0) return false;
+			if (height == 0 || width == 0) return null;
+			if (character.getStrokesSize() == 0) return null;
 
 			for (int i=0; i < character.getStrokesSize(); i++) {
 				int ssize = character.getStrokeSize(i);
-				if(ssize == 0) return false;
+				if(ssize == 0) return null;
 
 				for (int j=0; j < ssize; ++j) {
 					Node n = new Node(
@@ -170,19 +170,19 @@ public class Features {
 			List<NodePair> nodePairs = new ArrayList<NodePair>();
 			Node first = nodes.get(sid).get(0);
 			Node last  = nodes.get(sid).get(nodes.get(sid).size() - 1);
-			getVertex(first, last, 0, nodePairs);
-			makeVertexFeature(sid, nodePairs);
-			if(prev !=null) {
-				makeMoveFeature(sid, prev, first);
+			features.getVertex(first, last, 0, nodePairs);
+			features.makeVertexFeature(sid, nodePairs);
+			if(prev != null) {
+				features.makeMoveFeature(sid, prev, first);
 			}
 			prev = last;
 		}
 
-		addFeature(2000000,  nodes.size());
-		addFeature(2000000 + nodes.size(), 10);
+		features.addFeature(2000000,  nodes.size());
+		features.addFeature(2000000 + nodes.size(), 10);
 
 		// sort
-		Collections.sort(features, new Comparator<FeatureNode>() {
+		Collections.sort(features.features, new Comparator<FeatureNode>() {
 			@Override
 			public int compare(FeatureNode f1, FeatureNode f2) {
 				return f1.index - f2.index;
@@ -193,9 +193,9 @@ public class Features {
 			FeatureNode f = new FeatureNode();
 			f.index = -1;
 			f.value = 0.0;
-			features.add(f);
+			features.features.add(f);
 		}
-		return true;
+		return features;
 
 	}
 

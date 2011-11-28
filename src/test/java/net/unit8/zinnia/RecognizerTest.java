@@ -22,6 +22,15 @@ public class RecognizerTest {
 		c.add(3, 57, 203);
 		c.add(4, 111, 71);
 		c.add(4, 219, 173);
+		c.add(5, 81, 161);
+		c.add(5, 93, 281);
+		c.add(6, 99, 167);
+		c.add(6, 207, 167);
+		c.add(6, 189, 245);
+		c.add(7, 99, 227);
+		c.add(7, 189, 227);
+		c.add(8, 111, 257);
+		c.add(8, 189, 245);
 
 		Result result = recognizer.classify(c, 10);
 		if(result == null) {

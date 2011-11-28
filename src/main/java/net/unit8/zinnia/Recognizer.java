@@ -57,12 +57,13 @@ public class Recognizer {
 			int len;
 			for(len = 0;  b[len] != 0 && len < 16; len++) ;
 			m.character = new String(b, 0, len, charset);
-			m.bias = buffer.getInt();
+			float bias = buffer.getFloat();
+			m.bias = bias;
 
 			while(true) {
 				FeatureNode f = new FeatureNode();
 				f.index = buffer.getInt();
-				f.value = buffer.getInt();
+				f.value = buffer.getFloat();
 				m.x.add(f);
 				if(f.index == -1)
 					break;
@@ -83,10 +84,11 @@ public class Recognizer {
 			return null;
 		}
 
-		Features feature = new Features();
-		if(!feature.read(character)) {
+		Features feature = Features.read(character);
+		if (feature == null) {
 			return null;
 		}
+
 		List<FeatureNode> x = feature.get();
 		List<Pair<Double, String>> results
 			= new ArrayList<Pair<Double, String>>(model.size());
@@ -100,7 +102,7 @@ public class Recognizer {
 		nbest = Math.min(nbest, results.size());
 		Collections.sort(results, new Comparator<Pair<Double, String>>() {
 			public int compare(Pair<Double, String> p1, Pair<Double, String> p2) {
-				return (int)(p2.first - p1.first);
+				return (int)Math.signum(p2.first - p1.first);
 			}
 		});
 
