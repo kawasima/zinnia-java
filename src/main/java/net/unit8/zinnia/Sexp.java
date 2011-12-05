@@ -6,47 +6,52 @@ import java.text.StringCharacterIterator;
 
 public class Sexp {
 	private static enum Stat { CONS, ATOM };
-		
+
 	public static class Cell {
 		private Stat stat;
 		private Cons cons;
 		private String atom;
+
 		public boolean isCons() {
 			return stat == Stat.CONS;
 		}
 		public boolean isAtom() {
 			return stat == Stat.ATOM;
 		}
-		
+
 		public void setCdr(Cell cell) {
-			stat = Stat.CONS;
-			if(cons == null)
-				cons = new Cons();
-			cons.car = cell;
-		}
-		
-		public void setCar(Cell cell) {
 			stat = Stat.CONS;
 			if(cons == null)
 				cons = new Cons();
 			cons.cdr = cell;
 		}
-		
+
+		public void setCar(Cell cell) {
+			stat = Stat.CONS;
+			if(cons == null)
+				cons = new Cons();
+			cons.car = cell;
+		}
+
 		public void setAtom(String atom) {
 			stat = Stat.ATOM;
 			this.atom = atom;
 		}
-		public Cell getCar()  { return cons.car; }
-		public Cell getCdr()  { return cons.cdr; }
+		public Cell getCar()  {
+			return (cons != null) ? cons.car : null;
+		}
+		public Cell getCdr()  {
+			return (cons != null) ? cons.cdr : null;
+		}
 		public String getAtom() { return atom; }
-		
+
 	}
-	
+
 	public static class Cons {
 		public Cell car;
 		public Cell cdr;
 	}
-	
+
 
 	public Cell read(StringCharacterIterator sexp) throws IOException {
 		comment(sexp);
@@ -58,15 +63,15 @@ public class Sexp {
 		}
 		return null;
 	}
-	
+
 	public int nextToken(StringCharacterIterator sexp, char n) throws IOException {
-		char c;
-		do {
-			c = sexp.next();
+		char c =sexp.next();
+
+		for (; c == ' '; c = sexp.next()) {
 			if(c == CharacterIterator.DONE)
 				return -1;
-		} while(c == ' ');
-		
+		}
+
 		if(c == n) {
 			return 1;
 		} else {
@@ -74,7 +79,7 @@ public class Sexp {
 			return 0;
 		}
 	}
-	
+
 	public void comment(StringCharacterIterator sexp) throws IOException {
 		int r = nextToken(sexp, ';');
 		if(r == 1) {
@@ -86,7 +91,7 @@ public class Sexp {
 			comment(sexp);
 		}
 	}
-	
+
 	public Cell readCdr(StringCharacterIterator sexp) throws IOException {
 		comment(sexp);
 		int r = nextToken(sexp, ')');
@@ -95,7 +100,7 @@ public class Sexp {
 		}
 		return null;
 	}
-	
+
 	public Cell readCar(StringCharacterIterator sexp) throws IOException {
 		comment(sexp);
 		int r = nextToken(sexp, ')');
@@ -107,11 +112,11 @@ public class Sexp {
 		}
 		return null;
 	}
-	
+
 	public Cell readAtom(StringCharacterIterator sexp) throws IOException {
 		comment(sexp);
 		char c = sexp.next();
-		
+
 		if(c == ' ' || c == '(' || c == ')' || c == CharacterIterator.DONE) {
 			return null;
 		} else {

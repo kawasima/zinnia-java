@@ -114,7 +114,7 @@ public class Character {
 
 	public static Character parse(String str) throws IOException {
 		Character c = new Character();
-		Sexp.Cell rootCell = c.sexp.read(new StringCharacterIterator(str));
+		Sexp.Cell rootCell = c.sexp.read(new StringCharacterIterator(" "+str));
 		if (rootCell == null) {
 			return null;
 		}

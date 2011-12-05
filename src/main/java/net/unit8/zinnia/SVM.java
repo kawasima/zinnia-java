@@ -15,13 +15,13 @@ public class SVM {
 			List<Double> y,
 			List<List<FeatureNode>> x,
 			double C,
-			Double[] w) {
+			double[] w) {
 		int activeSize = l;
 		double PGmaxOld = INF;
 		double PGminOld = -INF;
-		Double[] qd = new Double[l];
-		Integer[] index = new Integer[l];
-		Double[] alpha = new Double[l];
+		double[] qd = new double[l];
+		int[] index = new int[l];
+		double[] alpha = new double[l];
 
 		for(int i=0; i<l ; i++) {
 			index[i]=i;

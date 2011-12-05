@@ -22,6 +22,9 @@ public class Trainer {
 	public static final double THRESHOLD = 1.0e-3;
 	int maxDim;
 
+	public Trainer() {
+		x = new ArrayList<Pair<String,List<FeatureNode>>>();
+	}
 	List<FeatureNode> copyFeatureNode(List<FeatureNode> fn, int maxDim) {
 		return null;
 	}
@@ -50,6 +53,10 @@ public class Trainer {
 		Features features = Features.read(c);
 		List<FeatureNode> fn = features.get();
 		x.add(new Pair<String, List<FeatureNode>>(y, fn));
+		for (FeatureNode node : fn) {
+			maxDim = Math.max(node.index, maxDim);
+		}
+
 	}
 
 	public boolean train(String filename) throws IOException {
@@ -57,7 +64,7 @@ public class Trainer {
 		for (int i=0; i < x.size(); ++i)
 			dicSet.add(x.get(i).first);
 
-		Double[] w = new Double[maxDim + 1];
+		double[] w = new double[maxDim + 1];
 		List<Double> y = new ArrayList<Double>();
 		List<List<FeatureNode>> xCopy = new ArrayList<List<FeatureNode>>();
 
@@ -81,7 +88,7 @@ public class Trainer {
 						w);
 				ofs.write(dic.get(i));
 				ofs.write(" ");
-				ofs.write(w[0].toString());
+				ofs.write(Double.toString(w[0]));
 
 				for (int j = 1; j < w.length; ++j) {
 					if (Math.abs(w[j]) >= THRESHOLD) {
@@ -97,7 +104,7 @@ public class Trainer {
 		} finally {
 			IOUtils.closeQuietly(ofs);
 		}
-		convert(filename+"txt", filename, 0.0f);
+		convert(filename+".txt", filename, 0.0f);
 		return false;
 	}
 
