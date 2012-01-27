@@ -103,13 +103,12 @@ public class Character {
 		this.height = height;
 	}
 
-	public boolean add(int id,int x, int y) {
+	public void add(int id,int x, int y) {
 		Dot d = new Dot(x, y);
 		for(int size = strokes.size(); size <= id; size++) {
 			strokes.add(new ArrayList<Dot>());
 		}
 		strokes.get(id).add(d);
-		return true;
 	}
 
 	public static Character parse(String str) throws IOException {

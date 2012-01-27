@@ -79,7 +79,23 @@ $(document).ready(function() {
 		$(this).addClass("ui-btn-ctrl");
 		$(this).removeClass("ui-btn-ctrl-active");
 	});
+	$("#learn").click(function() {
+		var c = $(":input[name=c]").val();
+		if(!c) {
+			alert("何を覚えろっちゅーねん");
+			return false;
+		}
+		$.post('/train',
+			{x:250, y:250, strokes: JSON.stringify(strokes), c: c},
+			function(data) {
+				if(onDrawing) {
+					sigpad.clearCanvas();
+				}
+			}
 
+		);
+
+	});
 });
 </script>
 <title>手書き認識</title>
@@ -112,5 +128,12 @@ $(document).ready(function() {
 		<div class="ui-btn-close ui-btn-ctrl">確定</div>
 	</div>
 </div>
+<div style="clear: both">
+	<form>
+		<input type="text" name="c" size="3" maxlength="1"/>
+		<input type="button" id="learn" value="覚えさす"/>
+	</form>
+</div>
+
 </body>
 </html>

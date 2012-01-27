@@ -78,7 +78,7 @@ public class Trainer {
 				if (makeExample(dic.get(i), x, y, xCopy)) {
 					System.err.println("cannot make training data");
 				}
-				System.out.println("learning: (" + i + "/" + dic.size() + ") " + dic.get(i) + " ");
+				System.out.print("learning: (" + i + "/" + dic.size() + ") " + dic.get(i) + " ");
 
 				SVM.train(y.size(),
 						w.length,
@@ -88,14 +88,14 @@ public class Trainer {
 						w);
 				ofs.write(dic.get(i));
 				ofs.write(" ");
-				ofs.write(Double.toString(w[0]));
+				ofs.write(Float.toString((float)w[0]));
 
 				for (int j = 1; j < w.length; ++j) {
 					if (Math.abs(w[j]) >= THRESHOLD) {
 						ofs.write(" ");
 						ofs.write(Integer.toString(j));
 						ofs.write(":");
-						ofs.write(Double.toString(w[j]));
+						ofs.write(Float.toString((float)w[j]));
 					}
 				}
 				ofs.write("\n");
