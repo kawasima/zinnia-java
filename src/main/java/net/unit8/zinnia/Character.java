@@ -165,4 +165,24 @@ public class Character {
 
 		return c;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder(1024);
+		sb.append("(character (value ")
+			.append(getValue()).append(")")
+			.append("(width ").append(getWidth()).append(")")
+			.append("(height ").append(getHeight()).append(")")
+			.append("(strokes ");
+		for (int id = 0; id < getStrokesSize(); id++) {
+			sb.append("(");
+			for (int s = 0; s < getStrokeSize(id); s++) {
+				sb.append("(").append(getX(id, s)).append(" ").append(getY(id, s)).append(")");
+			}
+			sb.append(")");
+		}
+		sb.append(")");
+
+		return sb.toString();
+	}
 }

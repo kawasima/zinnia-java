@@ -75,7 +75,7 @@ public class Trainer {
 			ofs = new BufferedWriter(new FileWriter(new File(filename + ".txt")));
 			List<String> dic = new ArrayList<String>(dicSet);
 			for (int i=0; i<dic.size(); ++i) {
-				if (makeExample(dic.get(i), x, y, xCopy)) {
+				if (!makeExample(dic.get(i), x, y, xCopy)) {
 					System.err.println("cannot make training data");
 				}
 				System.out.print("learning: (" + i + "/" + dic.size() + ") " + dic.get(i) + " ");
